@@ -15,7 +15,7 @@ var basicArray = [firstQuestion, secondQuestion, thirdQuestion, fourthQuestion]
 var firstCloze = new ClozeCard('Cloud Strife is the main protagonist of Final Fantasy VII', 'Cloud Strife')
 var secondcloze = new ClozeCard('Threeve is a combination of three and five', 'Threeve')
 var thirdCloze = new ClozeCard('Alan Turing created his universal computation machine to run a code', 'a code')
-// var fourthCloze = new ClozeCard()
+
 
 var clozeArray = [firstCloze, secondcloze, thirdCloze]
 
@@ -27,7 +27,7 @@ function runGame() {
         type: 'list',
         name: 'cardChoice',
         message: 'What would you like to do?',
-        choices: ["Basic Cards", "Cloze Cards", "Make my own cards"]
+        choices: ["Basic Cards", "Cloze Cards", "Make my own card", "Quit"]
     }]).then(function(user) {
 
         switch (user.cardChoice){
@@ -39,11 +39,18 @@ function runGame() {
             case 'Cloze Cards':
                 var nextQuestion = clozeArray.pop()
                 askQuestion(nextQuestion.getquestion(), nextQuestion.getanswer(), clozeArray)
-                break
+                break;
 
-            // case 'Make my own cards':
+            case 'Make my own card':
+                makeOwnCard();
+                break; 
 
-        }
+            case 'Quit':
+                console.log('Goodbye')
+                return;
+                break;        
+
+        } //closes switch case
 
     }).catch(function (){
     	console.log('Rejected')
@@ -70,7 +77,7 @@ function askQuestion(question, answer, aquestions){
 
         if (aquestions.length === 0){
             console.log('No more questions');
-            return 
+            runGame() 
         }
 
         var nextQuestion = aquestions.pop()
@@ -83,3 +90,39 @@ function askQuestion(question, answer, aquestions){
 }
 
 
+function makeOwnCard() {
+    inquirer.prompt([{
+        type: 'list',
+        name: 'makeCardChoice',
+        message: 'What kind of card would you like to make?',
+        choices: ["Basic Card", "Cloze Card"]
+    }]).then(function(user) {
+        if (user.makeCardChoice === 'Basic Card') {
+            inquirer.prompt([{
+                type: 'imput',
+                name: 'writeQuestion',
+                message: 'Type in your question.'
+            }, {
+                type: 'input',
+                name: 'writeAnswer',
+                message: 'Type the answer to your question.'
+            }]).then(function(userQuestion) {
+                basicArray.push(new BasicCard(userQuestion.writeQuestion, userQuestion.writeAnswer))
+                runGame()
+            })
+        } else {
+            inquirer.prompt([{
+                type: 'imput',
+                name: 'writeClozeQuestion',
+                message: 'Type in your question.'
+            }, {
+                type: 'input',
+                name: 'writeClozeAnswer',
+                message: 'Type the text to be ommited.'
+            }]).then(function(userClozeQuestion) {
+                clozeArray.push(new ClozeCard(userClozeQuestion.writeClozeQuestion, userClozeQuestion.writeClozeAnswer))
+                runGame()
+            })
+        }
+    })
+}
